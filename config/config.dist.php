@@ -355,6 +355,10 @@ return [
             # Options: none, future, current
             'start.time.constraint' => 'future',
 
+            # Only used when start.time.constraint is 'current': a slot that has already started can be
+            # reserved only while at least this many minutes remain before it ends (0 = until the slot ends)
+            'current.slot.cutoff.minutes' => 0,
+
             # Require approval when an existing reservation is updated (true/false)
             'updates.require.approval' => false,
 

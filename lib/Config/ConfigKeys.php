@@ -788,6 +788,15 @@ class ConfigKeys extends AbstractConfigKeys
         'config_file_comment' => "Restrict start times (e.g., 'future', 'none', 'current')\nNote: In the standard reservation create/update flow, exemptions from this constraint apply only in specific cases:\n  - Application admins are always exempt.\n  - Group admins are exempt only when acting as admin for the reservation user.\n  - Resource and schedule admins are exempt only when they administer all resources in the reservation.",
         'section' => 'reservation'
     ];
+    public const RESERVATION_CURRENT_SLOT_CUTOFF_MINUTES = [
+        'key' => 'reservation.current.slot.cutoff.minutes',
+        'type' => 'integer',
+        'default' => 0,
+        'label' => 'Current Slot Cutoff Minutes',
+        'description' => "Only used when the start time constraint is 'current'. A slot that has already started can be reserved only while at least this many minutes remain before it ends. 0 allows booking until the slot ends.",
+        'config_file_comment' => "Only used when start.time.constraint is 'current': a slot that has already started can be\nreserved only while at least this many minutes remain before it ends (0 = until the slot ends)",
+        'section' => 'reservation'
+    ];
     public const RESERVATION_UPDATES_REQUIRE_APPROVAL = [
         'key' => 'reservation.updates.require.approval',
         'type' => 'boolean',

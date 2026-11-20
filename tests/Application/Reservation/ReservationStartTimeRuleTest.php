@@ -171,4 +171,98 @@ class ReservationStartTimeRuleTest extends TestBase
 
         $this->assertTrue($result->IsValid());
     }
+
+    public function testNewReservationInStartedSlotIsValidBeforeCutoff()
+    {
+        $result = $this->ValidateNewReservationInStartedSlot('2026-11-20 10:40:00');
+
+        $this->assertTrue($result->IsValid());
+    }
+
+    public function testNewReservationInStartedSlotIsInvalidAfterCutoff()
+    {
+        $result = $this->ValidateNewReservationInStartedSlot('2026-11-20 10:50:00');
+
+        $this->assertFalse($result->IsValid());
+    }
+
+    public function testCutoffDoesNotApplyToExistingReservationWithUnchangedStart()
+    {
+        $this->fakeConfig->SetKey(ConfigKeys::RESERVATION_START_TIME_CONSTRAINT, ReservationStartTimeConstraint::CURRENT);
+        $this->fakeConfig->SetKey(ConfigKeys::RESERVATION_CURRENT_SLOT_CUTOFF_MINUTES, 15);
+        Date::_SetNow(Date::Parse('2026-11-20 10:50:00', 'UTC'));
+
+        $start = Date::Parse('2026-11-20 10:00:00', 'UTC');
+        $instance = new TestReservation('1', new DateRange($start, $start->AddHours(1)));
+        // extend the ongoing reservation by one slot, keeping the start time
+        $instance->SetReservationDate(new DateRange($start, $start->AddHours(2)));
+
+        $builder = new ExistingReservationSeriesBuilder();
+        $builder->WithCurrentInstance($instance);
+        $series = $builder->Build();
+
+        $this->scheduleRepository->method('GetLayout')->willReturn($this->layout);
+        $this->layout->method('GetPeriod')
+                ->willReturnCallback(fn (Date $date) => $this->HourSlotContaining($date));
+
+        $rule = new ReservationStartTimeRule($this->scheduleRepository);
+        $result = $rule->Validate($series, null);
+
+        $this->assertTrue($result->IsValid());
+    }
+
+    public function testCutoffAppliesToExistingReservationMovedIntoStartedSlot()
+    {
+        $this->fakeConfig->SetKey(ConfigKeys::RESERVATION_START_TIME_CONSTRAINT, ReservationStartTimeConstraint::CURRENT);
+        $this->fakeConfig->SetKey(ConfigKeys::RESERVATION_CURRENT_SLOT_CUTOFF_MINUTES, 15);
+        Date::_SetNow(Date::Parse('2026-11-20 10:50:00', 'UTC'));
+
+        $originalStart = Date::Parse('2026-11-20 14:00:00', 'UTC');
+        $instance = new TestReservation('1', new DateRange($originalStart, $originalStart->AddHours(1)));
+        $newStart = Date::Parse('2026-11-20 10:00:00', 'UTC');
+        $instance->SetReservationDate(new DateRange($newStart, $newStart->AddHours(1)));
+
+        $builder = new ExistingReservationSeriesBuilder();
+        $builder->WithCurrentInstance($instance);
+        $series = $builder->Build();
+
+        $this->scheduleRepository->method('GetLayout')->willReturn($this->layout);
+        $this->layout->method('GetPeriod')
+                ->willReturnCallback(fn (Date $date) => $this->HourSlotContaining($date));
+
+        $rule = new ReservationStartTimeRule($this->scheduleRepository);
+        $result = $rule->Validate($series, null);
+
+        $this->assertFalse($result->IsValid());
+    }
+
+    private function ValidateNewReservationInStartedSlot(string $now): ReservationRuleResult
+    {
+        $this->fakeConfig->SetKey(ConfigKeys::RESERVATION_START_TIME_CONSTRAINT, ReservationStartTimeConstraint::CURRENT);
+        $this->fakeConfig->SetKey(ConfigKeys::RESERVATION_CURRENT_SLOT_CUTOFF_MINUTES, 15);
+        Date::_SetNow(Date::Parse($now, 'UTC'));
+
+        // fixed slot 10:00-11:00
+        $start = Date::Parse('2026-11-20 10:00:00', 'UTC');
+        $end = Date::Parse('2026-11-20 11:00:00', 'UTC');
+
+        $reservation = new TestReservationSeries();
+        $reservation->WithScheduleId(123);
+        $reservation->WithCurrentInstance(new TestReservation('1', new DateRange($start, $end)));
+
+        $this->scheduleRepository->method('GetLayout')->willReturn($this->layout);
+        $this->layout->method('GetPeriod')
+                ->willReturnCallback(fn (Date $date) => $this->HourSlotContaining($date));
+
+        $rule = new ReservationStartTimeRule($this->scheduleRepository);
+
+        return $rule->Validate($reservation, null);
+    }
+
+    private function HourSlotContaining(Date $date): SchedulePeriod
+    {
+        $begin = Date::Create($date->Year(), $date->Month(), $date->Day(), $date->Hour(), 0, 0, 'UTC');
+
+        return new SchedulePeriod($begin, $begin->AddHours(1));
+    }
 }
