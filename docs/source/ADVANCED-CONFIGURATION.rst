@@ -441,6 +441,7 @@ Reservation Behavior
        'allow.guest.participation' => false,
        'allow.wait.list' => false,
        'start.time.constraint' => 'future',
+       'current.slot.cutoff.minutes' => 0,
        'updates.require.approval' => false,
        'title.required' => false,
        'description.required' => false,
@@ -471,6 +472,19 @@ Reservation Behavior
   always exempt from this constraint. Group admins are exempt when they
   administer the reservation owner (user), while resource and schedule admins
   are exempt only when they administer all resources in the reservation.
+
+**reservation.current.slot.cutoff.minutes**
+  Only used when ``reservation.start.time.constraint`` is ``'current'``. With
+  ``'current'``, a slot that has already started (for example a fixed
+  10:00-11:00 slot at 10:20) can still be reserved if it is available. This
+  setting limits how late that is possible: the slot can be reserved only
+  while at least this many minutes remain before it ends. For example ``15``
+  allows booking the 10:00-11:00 slot until 10:45. ``0`` (the default) allows
+  booking until the slot ends. Existing reservations that keep their start
+  time are not affected, so an ongoing reservation can still be edited or
+  extended.
+  Individual resources can override this in the Access settings of Manage
+  Resources, see :doc:`ADMINISTRATION`.
 
 **reservation.updates.require.approval**
   Require approval when editing existing approved reservations.

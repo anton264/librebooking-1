@@ -150,7 +150,7 @@ class ReservationSlot implements IReservationSlot
         return $this->_reservation->RequiresApproval;
     }
 
-    public function IsPastDate(Date $date)
+    public function IsPastDate(Date $date, ?int $startedSlotCutoffMinutes = null)
     {
         return $this->_displayDate->SetTime($this->Begin())->LessThan($date);
     }

@@ -882,6 +882,7 @@ class ResourceDto implements IBookableResource
      * @param int|null $autoReleaseMinutes
      * @param string|null $color
      * @param int|null $maxConcurrentReservations
+     * @param int|null $startedSlotCutoffMinutes null to follow the global start time constraint
      */
     public function __construct(
         $id,
@@ -899,7 +900,8 @@ class ResourceDto implements IBookableResource
         $isAutoReleased,
         $autoReleaseMinutes,
         $color,
-        $maxConcurrentReservations
+        $maxConcurrentReservations,
+        ?int $startedSlotCutoffMinutes = null
     ) {
         $this->Id = $id;
         $this->Name = $name;
@@ -922,6 +924,7 @@ class ResourceDto implements IBookableResource
             $this->TextColor = $textColor->__toString();
         }
         $this->MaxConcurrentReservations = empty($maxConcurrentReservations) ? 1 : $maxConcurrentReservations;
+        $this->StartedSlotCutoffMinutes = $startedSlotCutoffMinutes;
     }
 
     /**
@@ -1005,6 +1008,11 @@ class ResourceDto implements IBookableResource
      * @var int
      */
     public $MaxConcurrentReservations;
+
+    /**
+     * @var int|null
+     */
+    public $StartedSlotCutoffMinutes;
 
     /**
      * alias of GetId()
@@ -1157,6 +1165,14 @@ class ResourceDto implements IBookableResource
     public function GetMaxConcurrentReservations()
     {
         return max($this->MaxConcurrentReservations, 1);
+    }
+
+    /**
+     * @return int|null null when the global start time constraint applies
+     */
+    public function GetStartedSlotCutoffMinutes(): ?int
+    {
+        return $this->StartedSlotCutoffMinutes;
     }
 }
 

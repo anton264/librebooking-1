@@ -132,9 +132,16 @@ class SchedulePeriod
         return $this->_begin->DateCompare($date) < 0;
     }
 
-    public function IsPastDate()
+    /**
+     * @param int|null $startedSlotCutoffMinutes per-resource override, see ReservationPastTimeConstraint::IsPast()
+     */
+    public function IsPastDate(?int $startedSlotCutoffMinutes = null)
     {
-        return ReservationPastTimeConstraint::IsPast($this->BeginDate(), $this->EndDate());
+        return ReservationPastTimeConstraint::IsPast(
+            begin: $this->BeginDate(),
+            end: $this->EndDate(),
+            resourceStartedSlotCutoffMinutes: $startedSlotCutoffMinutes
+        );
     }
 
     /**

@@ -281,6 +281,9 @@ class ManageResourcesPresenter extends ActionPresenter
         $autoReleaseMinutes = $this->page->GetAutoReleaseMinutes();
         $allowConcurrent = $this->page->GetAllowConcurrentReservations();
         $maxConcurrent = $allowConcurrent ? $this->page->GetMaxConcurrentReservations() : 1;
+        $startedSlotCutoff = $this->page->GetAllowStartedSlotBooking()
+            ? max(0, $this->page->GetStartedSlotCutoffMinutes() ?? 0)
+            : null;
 
         $resource = $this->resourceRepository->LoadById($resourceId);
 
@@ -293,9 +296,10 @@ class ManageResourcesPresenter extends ActionPresenter
         $resource->SetMaxNotice($maxNotice);
         $resource->SetCheckin($enableCheckin, $autoReleaseMinutes);
         $resource->SetMaxConcurrentReservations($maxConcurrent);
+        $resource->SetStartedSlotCutoffMinutes($startedSlotCutoff);
 
         Log::Debug(
-            'Updating resource id=%s, requiresApproval=%s, autoAssign=%s, minNoticeAdd=%s, minNoticeUpdate=%s, minNoticeDelete=%s, maxNotice=%s, maxConcurrent=%s',
+            'Updating resource id=%s, requiresApproval=%s, autoAssign=%s, minNoticeAdd=%s, minNoticeUpdate=%s, minNoticeDelete=%s, maxNotice=%s, maxConcurrent=%s, startedSlotCutoff=%s',
             $resourceId,
             $requiresApproval,
             $autoAssign,
@@ -303,7 +307,8 @@ class ManageResourcesPresenter extends ActionPresenter
             $minNoticeUpdate,
             $minNoticeDelete,
             $maxNotice,
-            $maxConcurrent
+            $maxConcurrent,
+            $startedSlotCutoff ?? 'global'
         );
 
         $this->resourceRepository->Update($resource);

@@ -270,6 +270,7 @@ class ResourceDisplayPage extends ActionPage implements IResourceDisplayPage, IR
         $this->Set('ResourceName', $resource->GetName());
         $this->Set('ResourceId', $resource->GetId());
         $this->Set('PublicResourceId', $resource->GetPublicId());
+        $this->Set('StartedSlotCutoff', $resource->GetStartedSlotCutoffMinutes());
     }
 
     public function DisplayAvailability(IDailyLayout $dailyLayout, Date $today, Date $reservationDate, $current, $next, $upcoming, $requiresCheckin, $checkinReferenceNumber)

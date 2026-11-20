@@ -218,6 +218,17 @@ automatically release a reserved time if a user does not check in within a
 given amount of time. To automatically release reservations you must
 configure the autorelease job.
 
+By default a time slot can no longer be booked once it has started (see
+``reservation.start.time.constraint``). In the Access settings of a resource
+you can allow reserving a slot that has already started, as long as it is
+still available. You also set how many minutes before the end of the slot this
+stops being possible. For example, with 15 minutes a 10:00-11:00 slot can be
+booked until 10:45. With 0 the slot can be booked until it ends. This
+overrides the global ``reservation.start.time.constraint`` and
+``reservation.current.slot.cutoff.minutes`` settings for that resource, except
+when the global constraint is ``'none'``. A reservation with several resources
+is only allowed if every resource allows it.
+
 Resource Administrators
 ~~~~~~~~~~~~~~~~~~~~~~~
 

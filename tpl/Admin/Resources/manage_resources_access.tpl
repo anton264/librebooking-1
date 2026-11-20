@@ -72,6 +72,17 @@
         {translate key=AutoReleaseNotification args=$resource->GetAutoReleaseMinutes()}
     {/if}
 </div>
+<div class="startedSlotBooking"
+	 data-allow="{$resource->AllowsStartedSlotBooking()}"
+	 data-cutoff="{$resource->GetStartedSlotCutoffMinutes()}">
+    {if $resource->AllowsStartedSlotBooking()}
+        {if $resource->GetStartedSlotCutoffMinutes() > 0}
+            {translate key=StartedSlotCutoffNotification args=$resource->GetStartedSlotCutoffMinutes()}
+        {else}
+            {translate key=StartedSlotBookingUntilEnd}
+        {/if}
+    {/if}
+</div>
 <div class="allowConcurrent"
 	 data-allow-concurrent="{$resource->GetAllowConcurrentReservations()}"
 	 data-max-concurrent="{$resource->GetMaxConcurrentReservations()}">

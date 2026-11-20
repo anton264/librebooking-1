@@ -148,6 +148,12 @@ class BookableResource implements IBookableResource
     protected $_maxConcurrentReservations = 1;
 
     /**
+     * Minutes before the end of an already started slot until which the slot
+     * can still be reserved. Null means the global start time constraint applies.
+     */
+    protected ?int $_startedSlotCutoffMinutes = null;
+
+    /**
      * @var array|AttributeValue[]
      */
     protected $_attributeValues = [];
@@ -1266,6 +1272,32 @@ class BookableResource implements IBookableResource
     }
 
     /**
+     * True when this resource allows reserving a slot that has already
+     * started, regardless of the global start time constraint.
+     */
+    public function AllowsStartedSlotBooking(): bool
+    {
+        return $this->_startedSlotCutoffMinutes !== null;
+    }
+
+    /**
+     * @return int|null minutes before the end of a started slot until which it
+     *                  can be reserved, or null to follow the global setting
+     */
+    public function GetStartedSlotCutoffMinutes(): ?int
+    {
+        return $this->_startedSlotCutoffMinutes;
+    }
+
+    /**
+     * @param int|null $minutes null to follow the global start time constraint
+     */
+    public function SetStartedSlotCutoffMinutes(?int $minutes): void
+    {
+        $this->_startedSlotCutoffMinutes = $minutes === null ? null : max(0, $minutes);
+    }
+
+    /**
      * @return string
      */
     public function GetSerializedProperties()
@@ -1281,6 +1313,7 @@ class BookableResource implements IBookableResource
     {
         $properties = ResourceProperties::Deserialize($propertiesAsJson);
         $this->SetMaxConcurrentReservations($properties->MaxConcurrentReservations);
+        $this->SetStartedSlotCutoffMinutes($properties->StartedSlotCutoffMinutes);
     }
 
     public function AsCopy($name)
@@ -1300,10 +1333,16 @@ class ResourceProperties
      */
     public $MaxConcurrentReservations;
 
+    /**
+     * @var int|null
+     */
+    public $StartedSlotCutoffMinutes = null;
+
     public static function FromResource(BookableResource $resource)
     {
         $obj = new ResourceProperties();
         $obj->MaxConcurrentReservations = $resource->GetMaxConcurrentReservations();
+        $obj->StartedSlotCutoffMinutes = $resource->GetStartedSlotCutoffMinutes();
 
         return $obj;
     }
@@ -1314,6 +1353,9 @@ class ResourceProperties
         $decoded = json_decode($propertiesAsJson ?? '{}');
         if (isset($decoded->MaxConcurrentReservations)) {
             $obj->MaxConcurrentReservations = $decoded->MaxConcurrentReservations;
+        }
+        if (isset($decoded->StartedSlotCutoffMinutes) && is_numeric($decoded->StartedSlotCutoffMinutes)) {
+            $obj->StartedSlotCutoffMinutes = (int) $decoded->StartedSlotCutoffMinutes;
         }
 
         return $obj;

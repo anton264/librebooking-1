@@ -1,6 +1,6 @@
 <!--- schedule-flipped.tpl --->
-{function name=displaySlotTall}
-    {call name=$DisplaySlotFactory->GetFunction($Slot, $AccessAllowed) Slot=$Slot Href=$Href SlotRef=$SlotRef ResourceId=$ResourceId}
+{function name=displaySlotTall StartedSlotCutoff=null}
+    {call name=$DisplaySlotFactory->GetFunction($Slot, $AccessAllowed, '', $StartedSlotCutoff) Slot=$Slot Href=$Href SlotRef=$SlotRef ResourceId=$ResourceId}
 {/function}
 
 {extends file="Schedule/schedule.tpl"}
@@ -63,7 +63,7 @@
                             {assign var=resourceId value=$resource->Id}
                             {assign var=slotRef value="{$period->BeginDate()->Format('YmdHis')}{$resourceId}"}
                             {assign var=slotHref value="{$CreateReservationPage}?rid={$resourceId}&sid={$ScheduleId}&rd={formatdate date=$date key=url}"}
-                            {displaySlotTall Slot=$period Href=$slotHref AccessAllowed=$resource->CanAccess SlotRef=$slotRef ResourceId=$resourceId}
+                            {displaySlotTall Slot=$period Href=$slotHref AccessAllowed=$resource->CanAccess SlotRef=$slotRef ResourceId=$resourceId StartedSlotCutoff=$resource->GetStartedSlotCutoffMinutes()}
                         {/foreach}
                     </tr>
                 {/foreach}

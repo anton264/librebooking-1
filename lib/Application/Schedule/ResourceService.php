@@ -176,22 +176,23 @@ class ResourceService implements IResourceService
             }
 
             $resourceDtos[] = new ResourceDto(
-                $resource->GetResourceId(),
-                $resource->GetName(),
-                $canAccess,
-                $canAccess && $filter->CanBook($resource),
-                $resource->GetScheduleId(),
-                $resource->GetMinLength(),
-                $resource->GetResourceTypeId(),
-                $resource->GetAdminGroupId(),
-                $resource->GetScheduleAdminGroupId(),
-                $resource->GetStatusId(),
-                $resource->GetRequiresApproval(),
-                $resource->IsCheckInEnabled(),
-                $resource->IsAutoReleased(),
-                $resource->GetAutoReleaseMinutes(),
-                $resource->GetColor(),
-                $resource->GetMaxConcurrentReservations()
+                id: $resource->GetResourceId(),
+                name: $resource->GetName(),
+                canAccess: $canAccess,
+                canBook: $canAccess && $filter->CanBook($resource),
+                scheduleId: $resource->GetScheduleId(),
+                minLength: $resource->GetMinLength(),
+                resourceTypeId: $resource->GetResourceTypeId(),
+                adminGroupId: $resource->GetAdminGroupId(),
+                scheduleAdminGroupId: $resource->GetScheduleAdminGroupId(),
+                statusId: $resource->GetStatusId(),
+                requiresApproval: $resource->GetRequiresApproval(),
+                isCheckInEnabled: $resource->IsCheckInEnabled(),
+                isAutoReleased: $resource->IsAutoReleased(),
+                autoReleaseMinutes: $resource->GetAutoReleaseMinutes(),
+                color: $resource->GetColor(),
+                maxConcurrentReservations: $resource->GetMaxConcurrentReservations(),
+                startedSlotCutoffMinutes: $resource->GetStartedSlotCutoffMinutes()
             );
         }
 
