@@ -2,28 +2,41 @@
 
 class ReservationPastTimeConstraint
 {
-    public static function IsPast(Date $begin, Date $end): bool
+    /**
+     * @param Date $begin slot begin
+     * @param Date $end slot end
+     * @param int|null $resourceStartedSlotCutoffMinutes per-resource override; when set,
+     *                 an already started slot can be reserved until this many minutes
+     *                 before it ends, regardless of the global 'future'/'current' setting
+     */
+    public static function IsPast(Date $begin, Date $end, ?int $resourceStartedSlotCutoffMinutes = null): bool
     {
-        $constraint = Configuration::Instance()->GetKey(ConfigKeys::RESERVATION_START_TIME_CONSTRAINT);
-
-        if (empty($constraint)) {
-            $constraint = ReservationStartTimeConstraint::_DEFAULT;
-        }
+        $constraint = self::StartTimeConstraint();
 
         if ($constraint == ReservationStartTimeConstraint::NONE) {
             return false;
         }
 
-        if ($constraint == ReservationStartTimeConstraint::CURRENT) {
-            $now = Date::Now();
-            if ($end->LessThan($now)) {
-                return true;
-            }
+        if ($resourceStartedSlotCutoffMinutes !== null) {
+            return self::IsPastStartedSlot($begin, $end, $resourceStartedSlotCutoffMinutes);
+        }
 
-            return $begin->LessThan($now) && self::IsPastCurrentSlotCutoff($end);
+        if ($constraint == ReservationStartTimeConstraint::CURRENT) {
+            return self::IsPastStartedSlot($begin, $end, self::CurrentSlotCutoffMinutes());
         }
 
         return $begin->LessThan(Date::Now());
+    }
+
+    public static function StartTimeConstraint(): string
+    {
+        $constraint = Configuration::Instance()->GetKey(ConfigKeys::RESERVATION_START_TIME_CONSTRAINT);
+
+        if (empty($constraint)) {
+            return ReservationStartTimeConstraint::_DEFAULT;
+        }
+
+        return (string) $constraint;
     }
 
     /**
@@ -41,13 +54,24 @@ class ReservationPastTimeConstraint
     }
 
     /**
-     * True when fewer than the configured cutoff minutes remain before the
-     * given slot end.
+     * True when fewer than the cutoff minutes remain before the given slot end.
+     *
+     * @param int|null $cutoffMinutes defaults to the global 'current' slot cutoff
      */
-    public static function IsPastCurrentSlotCutoff(Date $slotEnd): bool
+    public static function IsPastCurrentSlotCutoff(Date $slotEnd, ?int $cutoffMinutes = null): bool
     {
-        $cutoff = self::CurrentSlotCutoffMinutes();
+        $cutoff = $cutoffMinutes ?? self::CurrentSlotCutoffMinutes();
 
         return $slotEnd->AddMinutes(-$cutoff)->LessThan(Date::Now());
+    }
+
+    private static function IsPastStartedSlot(Date $begin, Date $end, int $cutoffMinutes): bool
+    {
+        $now = Date::Now();
+        if ($end->LessThan($now)) {
+            return true;
+        }
+
+        return $begin->LessThan($now) && self::IsPastCurrentSlotCutoff($end, $cutoffMinutes);
     }
 }

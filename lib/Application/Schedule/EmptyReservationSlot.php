@@ -113,9 +113,13 @@ class EmptyReservationSlot implements IReservationSlot
         return false;
     }
 
-    public function IsPastDate(Date $date)
+    public function IsPastDate(Date $date, ?int $startedSlotCutoffMinutes = null)
     {
-        return ReservationPastTimeConstraint::IsPast($this->BeginDate(), $this->EndDate());
+        return ReservationPastTimeConstraint::IsPast(
+            begin: $this->BeginDate(),
+            end: $this->EndDate(),
+            resourceStartedSlotCutoffMinutes: $startedSlotCutoffMinutes
+        );
     }
 
     public function ToTimezone($timezone)

@@ -323,6 +323,10 @@ interface IManageResourcesPage extends IUpdateResourcePage, IActionPage, IPageab
 
     public function GetAutoReleaseMinutes(): ?int;
 
+    public function GetAllowStartedSlotBooking(): bool;
+
+    public function GetStartedSlotCutoffMinutes(): ?int;
+
     public function GetCredits(): ?float;
 
     public function GetPeakCredits(): ?float;
@@ -953,6 +957,16 @@ class ManageResourcesPage extends ActionPage implements IManageResourcesPage
     public function GetAutoReleaseMinutes(): ?int
     {
         return $this->GetFormInt(key: FormKeys::AUTO_RELEASE_MINUTES);
+    }
+
+    public function GetAllowStartedSlotBooking(): bool
+    {
+        return $this->GetCheckbox(FormKeys::ALLOW_STARTED_SLOT_BOOKING);
+    }
+
+    public function GetStartedSlotCutoffMinutes(): ?int
+    {
+        return $this->GetFormInt(key: FormKeys::STARTED_SLOT_CUTOFF_MINUTES);
     }
 
     public function GetCredits(): ?float

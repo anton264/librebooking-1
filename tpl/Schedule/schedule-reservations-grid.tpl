@@ -1,6 +1,6 @@
 <!-- schedule-reservations-grid.tpl -->
-{function name=displaySlot}
-    {call name=$DisplaySlotFactory->GetFunction($Slot, $AccessAllowed) Slot=$Slot Href=$Href SlotRef=$SlotRef ResourceId=$ResourceId}
+{function name=displaySlot StartedSlotCutoff=null}
+    {call name=$DisplaySlotFactory->GetFunction($Slot, $AccessAllowed, '', $StartedSlotCutoff) Slot=$Slot Href=$Href SlotRef=$SlotRef ResourceId=$ResourceId}
 {/function}
 
 {assign var=TodaysDate value=Date::Now()}
@@ -51,7 +51,7 @@
                     </td>
                     {foreach from=$slots.$ts item=Slot}
                         {assign var=slotRef value="{$Slot->BeginDate()->Format('YmdHis')}{$resourceId}"}
-                        {displaySlot Slot=$Slot Href="$href" AccessAllowed=($resource->CanBook || $GuestViewBookable) SlotRef=$slotRef ResourceId=$resourceId}
+                        {displaySlot Slot=$Slot Href="$href" AccessAllowed=($resource->CanBook || $GuestViewBookable) SlotRef=$slotRef ResourceId=$resourceId StartedSlotCutoff=$resource->GetStartedSlotCutoffMinutes()}
                     {/foreach}
                 </tr>
             {/foreach}

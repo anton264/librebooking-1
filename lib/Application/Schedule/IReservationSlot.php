@@ -52,9 +52,11 @@ interface IReservationSlot
 
     /**
      * @param $date Date
+     * @param int|null $startedSlotCutoffMinutes per-resource override for booking
+     *                 already started slots; only used by empty slots
      * @return bool
      */
-    public function IsPastDate(Date $date);
+    public function IsPastDate(Date $date, ?int $startedSlotCutoffMinutes = null);
 
     /**
      * @return bool

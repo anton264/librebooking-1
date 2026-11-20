@@ -183,4 +183,46 @@ class ManageResourcesPresenterTest extends TestBase
         $this->resourceRepository->method('LoadById')->willReturn($resource);
         $this->resourceRepository->expects($this->once())->method('Update')->with($this->identicalTo($resource));
     }
+
+    public function testChangeAccessEnablesStartedSlotBookingWithCutoff(): void
+    {
+        $resource = BookableResource::CreateNew('Room', 5);
+        $this->ConfigureChangeAccess(resource: $resource, allowStartedSlotBooking: true, cutoffMinutes: 15);
+
+        $this->presenter->ChangeAccess();
+
+        $this->assertTrue($resource->AllowsStartedSlotBooking());
+        $this->assertSame(15, $resource->GetStartedSlotCutoffMinutes());
+    }
+
+    public function testChangeAccessTreatsEmptyCutoffAsUntilSlotEnds(): void
+    {
+        $resource = BookableResource::CreateNew('Room', 5);
+        $this->ConfigureChangeAccess(resource: $resource, allowStartedSlotBooking: true, cutoffMinutes: null);
+
+        $this->presenter->ChangeAccess();
+
+        $this->assertSame(0, $resource->GetStartedSlotCutoffMinutes());
+    }
+
+    public function testChangeAccessDisablesStartedSlotBooking(): void
+    {
+        $resource = BookableResource::CreateNew('Room', 5);
+        $resource->SetStartedSlotCutoffMinutes(15);
+        $this->ConfigureChangeAccess(resource: $resource, allowStartedSlotBooking: false, cutoffMinutes: 15);
+
+        $this->presenter->ChangeAccess();
+
+        $this->assertFalse($resource->AllowsStartedSlotBooking());
+        $this->assertNull($resource->GetStartedSlotCutoffMinutes());
+    }
+
+    private function ConfigureChangeAccess(BookableResource $resource, bool $allowStartedSlotBooking, ?int $cutoffMinutes): void
+    {
+        $this->page->method('GetResourceId')->willReturn(1);
+        $this->page->method('GetAllowStartedSlotBooking')->willReturn($allowStartedSlotBooking);
+        $this->page->method('GetStartedSlotCutoffMinutes')->willReturn($cutoffMinutes);
+        $this->resourceRepository->method('LoadById')->willReturn($resource);
+        $this->resourceRepository->expects($this->once())->method('Update')->with($this->identicalTo($resource));
+    }
 }

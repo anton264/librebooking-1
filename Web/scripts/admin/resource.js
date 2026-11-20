@@ -104,6 +104,10 @@ function ResourceManagement(opts) {
     maxConcurrent: $('#maxConcurrentReservations'),
     allowConcurrentDiv: document.getElementById('allowConcurrentDiv'),
 
+    allowStartedSlotBooking: $('#allowStartedSlotBookingChk'),
+    startedSlotCutoffMinutes: $('#startedSlotCutoffMinutes'),
+    startedSlotCutoffDiv: document.getElementById('startedSlotCutoffDiv'),
+
     toggleStatusChangeMessage: $('#toggleStatusChangeMessage'),
     sendStatusChangeMessageContent: $('#sendStatusChangeMessageContent'),
     statusMessageContent: $('#statusMessageContent'),
@@ -412,6 +416,10 @@ function ResourceManagement(opts) {
 
     elements.checkAllowConcurrent.on('change', function () {
       showHideConcurrent();
+    });
+
+    elements.allowStartedSlotBooking.on('change', function () {
+      showHideStartedSlotCutoff();
     });
 
     wireUpCheckboxToggle(elements.durationForm);
@@ -767,6 +775,13 @@ function ResourceManagement(opts) {
     elements.maxConcurrent.val(Math.max(2, Number.parseInt(resource.maxConcurrent)));
     showHideConcurrent();
 
+    elements.allowStartedSlotBooking.prop(
+      'checked',
+      resource.allowStartedSlotBooking && resource.allowStartedSlotBooking == '1'
+    );
+    elements.startedSlotCutoffMinutes.val(resource.startedSlotCutoffMinutes || 0);
+    showHideStartedSlotCutoff();
+
     elements.accessDialog.modal('show');
   };
 
@@ -776,6 +791,10 @@ function ResourceManagement(opts) {
 
   var showHideConcurrent = function () {
     syncCollapse(elements.allowConcurrentDiv, () => elements.checkAllowConcurrent.is(':checked'));
+  };
+
+  var showHideStartedSlotCutoff = function () {
+    syncCollapse(elements.startedSlotCutoffDiv, () => elements.allowStartedSlotBooking.is(':checked'));
   };
 
   var setDuration = function (container, resourceDuration) {
@@ -837,6 +856,7 @@ function ResourceManagement(opts) {
     var enableCheckin = result.find('.enableCheckin');
     var autoRelease = result.find('.autoRelease');
     var maxConcurrent = result.find('.allowConcurrent');
+    var startedSlotBooking = result.find('.startedSlotBooking');
 
     setDuration(startNoticeAdd, resource.startNoticeAdd);
     setDuration(startNoticeUpdate, resource.startNoticeUpdate);
@@ -850,6 +870,9 @@ function ResourceManagement(opts) {
 
     resource.maxConcurrent = maxConcurrent.data('max-concurrent');
     resource.allowConcurrent = maxConcurrent.data('allow-concurrent');
+
+    resource.allowStartedSlotBooking = startedSlotBooking.attr('data-allow');
+    resource.startedSlotCutoffMinutes = startedSlotBooking.attr('data-cutoff');
 
     elements.accessDialog.modal('hide');
   };

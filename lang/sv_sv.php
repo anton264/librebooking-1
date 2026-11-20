@@ -599,6 +599,10 @@ class sv_sv extends en_gb
         //END NEEDS CHECKING
 
 
+        $strings['AllowStartedSlotBooking'] = 'Tillåt bokning av en tid som redan har börjat';
+        $strings['StartedSlotCutoffNotification'] = 'En påbörjad tid kan bokas fram till %s minuter innan den slutar';
+        $strings['StartedSlotBookingUntilEnd'] = 'En påbörjad tid kan bokas fram till att den slutar';
+
         $this->Strings = $strings;
         return $this->Strings;
     }

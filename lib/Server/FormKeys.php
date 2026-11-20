@@ -47,6 +47,7 @@ class FormKeys
     public const AVAILABLE_BEGIN_DATE = 'AVAILABLE_BEGIN_DATE';
     public const AVAILABLE_END_DATE = 'AVAILABLE_END_DATE';
     public const ALLOW_CONCURRENT_RESERVATIONS = 'ALLOW_CONCURRENT_RESERVATIONS';
+    public const ALLOW_STARTED_SLOT_BOOKING = 'ALLOW_STARTED_SLOT_BOOKING';
 
     public const BEGIN_DATE = 'beginDate';
     public const BEGIN_PERIOD = 'beginPeriod';
@@ -253,6 +254,7 @@ class FormKeys
     public const SEND_AS_EMAIL = 'SEND_AS_EMAIL';
     public const SERIES_UPDATE_SCOPE = 'seriesUpdateScope';
     public const START_REMINDER_ENABLED = 'START_REMINDER_ENABLED';
+    public const STARTED_SLOT_CUTOFF_MINUTES = 'STARTED_SLOT_CUTOFF_MINUTES';
     public const START_REMINDER_TIME = 'START_REMINDER_TIME';
     public const START_REMINDER_INTERVAL = 'START_REMINDER_INTERVAL';
     public const SLOTS_BLOCKED = 'blockedSlots';

@@ -136,7 +136,7 @@
                                                                             {assign var="referenceNumber" value=$slot->Reservation()->ReferenceNumber}
                                                                         {elseif $slot->IsReservable()}
                                                                             {assign var="class" value="reservable"}
-                                                                            {if $slot->IsPastDate(Date::Now())}
+                                                                            {if $slot->IsPastDate(Date::Now(), $StartedSlotCutoff)}
                                                                                 {assign var="class" value="pasttime"}
                                                                             {/if}
                                                                         {else}
@@ -179,7 +179,7 @@
                                                             aria-describedby="starttime-addon" id="beginPeriod"
                                                             {formname key=BEGIN_PERIOD}>
                                                             {foreach from=$slots item=slot}
-                                                                {if $slot->IsReservable() && !$slot->IsPastDate($ReservationDate)}
+                                                                {if $slot->IsReservable() && !$slot->IsPastDate($ReservationDate, $StartedSlotCutoff)}
                                                                     <option value="{$slot->Begin()}">
                                                                         {$slot->Begin()->Format($TimeFormat)}</option>
                                                                 {/if}
@@ -195,7 +195,7 @@
                                                             aria-describedby="endtime-addon" id="endPeriod"
                                                             {formname key=END_PERIOD}>
                                                             {foreach from=$slots item=slot}
-                                                                {if $slot->IsReservable() && !$slot->IsPastDate($ReservationDate)}
+                                                                {if $slot->IsReservable() && !$slot->IsPastDate($ReservationDate, $StartedSlotCutoff)}
                                                                     <option value="{$slot->End()}">
                                                                         {$slot->End()->Format($TimeFormat)}
                                                                     </option>

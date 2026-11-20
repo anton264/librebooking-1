@@ -236,6 +236,61 @@ class ReservationStartTimeRuleTest extends TestBase
         $this->assertFalse($result->IsValid());
     }
 
+    public function testResourceCutoffAllowsStartedSlotWhenGlobalConstraintIsFuture()
+    {
+        $result = $this->ValidateNewStartedSlotReservationForResources('2026-11-20 10:40:00', [15]);
+
+        $this->assertTrue($result->IsValid());
+    }
+
+    public function testResourceCutoffBlocksStartedSlotAfterCutoff()
+    {
+        $result = $this->ValidateNewStartedSlotReservationForResources('2026-11-20 10:50:00', [15]);
+
+        $this->assertFalse($result->IsValid());
+    }
+
+    public function testEveryResourceMustAllowTheStartedSlot()
+    {
+        // second resource has no override, so the global 'future' constraint applies to it
+        $result = $this->ValidateNewStartedSlotReservationForResources('2026-11-20 10:40:00', [15, null]);
+
+        $this->assertFalse($result->IsValid());
+    }
+
+    /**
+     * @param array<int|null> $resourceCutoffs
+     */
+    private function ValidateNewStartedSlotReservationForResources(string $now, array $resourceCutoffs): ReservationRuleResult
+    {
+        $this->fakeConfig->SetKey(ConfigKeys::RESERVATION_START_TIME_CONSTRAINT, ReservationStartTimeConstraint::FUTURE);
+        Date::_SetNow(Date::Parse($now, 'UTC'));
+
+        $start = Date::Parse('2026-11-20 10:00:00', 'UTC');
+        $end = Date::Parse('2026-11-20 11:00:00', 'UTC');
+
+        $reservation = new TestReservationSeries();
+        $reservation->WithScheduleId(123);
+        foreach ($resourceCutoffs as $i => $cutoff) {
+            $resource = new FakeBookableResource($i + 1);
+            $resource->SetStartedSlotCutoffMinutes($cutoff);
+            if ($i === 0) {
+                $reservation->WithResource($resource);
+            } else {
+                $reservation->AddResource($resource);
+            }
+        }
+        $reservation->WithCurrentInstance(new TestReservation('1', new DateRange($start, $end)));
+
+        $this->scheduleRepository->method('GetLayout')->willReturn($this->layout);
+        $this->layout->method('GetPeriod')
+                ->willReturnCallback(fn (Date $date) => $this->HourSlotContaining($date));
+
+        $rule = new ReservationStartTimeRule($this->scheduleRepository);
+
+        return $rule->Validate($reservation, null);
+    }
+
     private function ValidateNewReservationInStartedSlot(string $now): ReservationRuleResult
     {
         $this->fakeConfig->SetKey(ConfigKeys::RESERVATION_START_TIME_CONSTRAINT, ReservationStartTimeConstraint::CURRENT);

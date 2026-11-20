@@ -1,8 +1,8 @@
 <!-- schedule-days-horizontal.tpl -->
 {extends file="Schedule/schedule.tpl"}
 
-{function name=displaySlot}
-    {call name=$DisplaySlotFactory->GetFunction($Slot, $AccessAllowed) Slot=$Slot Href=$Href SlotRef=$SlotRef ResourceId=$ResourceId}
+{function name=displaySlot StartedSlotCutoff=null}
+    {call name=$DisplaySlotFactory->GetFunction($Slot, $AccessAllowed, '', $StartedSlotCutoff) Slot=$Slot Href=$Href SlotRef=$SlotRef ResourceId=$ResourceId}
 {/function}
 
 {block name="reservations"}
@@ -72,7 +72,7 @@
                         {foreach from=$slots.$ts item=Slot}
                             {assign var=href value="{Pages::RESERVATION}?rid={$resource->Id}&sid={$ScheduleId}&rd={formatdate date=$date key=url}"}
                             {assign var=slotRef value="{$Slot->BeginDate()->Format('YmdHis')}{$resourceId}"}
-                            {displaySlot Slot=$Slot Href="$href" AccessAllowed=$resource->CanAccess SlotRef=$slotRef ResourceId=$resourceId}
+                            {displaySlot Slot=$Slot Href="$href" AccessAllowed=$resource->CanAccess SlotRef=$slotRef ResourceId=$resourceId StartedSlotCutoff=$resource->GetStartedSlotCutoffMinutes()}
                         {/foreach}
                     {/foreach}
                 </tr>

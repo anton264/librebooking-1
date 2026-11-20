@@ -1103,6 +1103,27 @@
 							</div>
 						</div>
 
+						<div class="editStartedSlotBooking">
+							<div class="form-check">
+								<input type="checkbox" {formname key=ALLOW_STARTED_SLOT_BOOKING}
+									id="allowStartedSlotBookingChk" value="1" class="form-check-input" />
+								<label for="allowStartedSlotBookingChk"
+									class="form-check-label">{translate key=AllowStartedSlotBooking}</label>
+							</div>
+							<div class="ms-4 collapse" id="startedSlotCutoffDiv">
+								{capture name="txtStartedSlotCutoff" assign="txtStartedSlotCutoff"}
+									<label for='startedSlotCutoffMinutes' class='visually-hidden'>Started Slot Cutoff
+										Minutes</label>
+									<input type='number' max='999' min='0' id='startedSlotCutoffMinutes'
+										class='minutes form-control form-control-sm w-auto'
+										{formname key=STARTED_SLOT_CUTOFF_MINUTES} />
+								{/capture}
+								<div class="d-flex align-items-center gap-1">
+									{translate key='StartedSlotCutoffNotification' args=$txtStartedSlotCutoff}
+								</div>
+							</div>
+						</div>
+
 						<div class="editConcurrent mb-2">
 							<div class="form-check">
 								<input type="checkbox" {formname key=ALLOW_CONCURRENT_RESERVATIONS}
@@ -2337,7 +2358,9 @@
 				credits: '{$resource->GetCreditsPerSlot()}',
 				peakCredits: '{$resource->GetPeakCreditsPerSlot()}',
 				allowConcurrent: '{$resource->GetAllowConcurrentReservations()}',
-				maxConcurrent: '{$resource->GetMaxConcurrentReservations()}'
+				maxConcurrent: '{$resource->GetMaxConcurrentReservations()}',
+				allowStartedSlotBooking: '{$resource->AllowsStartedSlotBooking()}',
+				startedSlotCutoffMinutes: '{$resource->GetStartedSlotCutoffMinutes()}'
 			};
 
 			{if $resource->HasMinLength()}

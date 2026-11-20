@@ -789,6 +789,9 @@ class en_us extends Language
         $strings['ResourceConcurrentReservations'] = 'Allow %s concurrent reservations';
         $strings['ResourceConcurrentReservationsNone'] = 'Do not allow concurrent reservations';
         $strings['AllowConcurrentReservations'] = 'Allow concurrent reservations';
+        $strings['AllowStartedSlotBooking'] = 'Allow reserving a slot that has already started';
+        $strings['StartedSlotCutoffNotification'] = 'A started slot can be reserved until %s minutes before it ends';
+        $strings['StartedSlotBookingUntilEnd'] = 'A started slot can be reserved until it ends';
         $strings['ResourceDisplayInstructions'] = 'No resource has been selected. You can find the URL to display a resource in Application Management, Resources. The resource must be publicly accessible.';
         $strings['Owner'] = 'Owner';
         $strings['MaximumConcurrentReservations'] = 'Maximum Concurrent Reservations';

@@ -483,6 +483,8 @@ Reservation Behavior
   booking until the slot ends. Existing reservations that keep their start
   time are not affected, so an ongoing reservation can still be edited or
   extended.
+  Individual resources can override this in the Access settings of Manage
+  Resources, see :doc:`ADMINISTRATION`.
 
 **reservation.updates.require.approval**
   Require approval when editing existing approved reservations.

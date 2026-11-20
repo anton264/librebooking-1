@@ -68,6 +68,32 @@ class ReservationPastTimeConstraintTest extends TestBase
         $this->assertSame(0, ReservationPastTimeConstraint::CurrentSlotCutoffMinutes());
     }
 
+    public function testResourceCutoffAllowsStartedSlotEvenWhenGlobalConstraintIsFuture()
+    {
+        $this->fakeConfig->SetKey(ConfigKeys::RESERVATION_START_TIME_CONSTRAINT, ReservationStartTimeConstraint::FUTURE);
+
+        $this->assertFalse(ReservationPastTimeConstraint::IsPast($this->Slot('10:00'), $this->Slot('11:00'), 15));
+        $this->assertTrue(ReservationPastTimeConstraint::IsPast($this->Slot('10:00'), $this->Slot('10:30'), 15));
+        $this->assertFalse(ReservationPastTimeConstraint::IsPast($this->Slot('10:00'), $this->Slot('10:30'), 0));
+    }
+
+    public function testResourceCutoffOverridesGlobalCurrentCutoff()
+    {
+        $this->fakeConfig->SetKey(ConfigKeys::RESERVATION_START_TIME_CONSTRAINT, ReservationStartTimeConstraint::CURRENT);
+        $this->fakeConfig->SetKey(ConfigKeys::RESERVATION_CURRENT_SLOT_CUTOFF_MINUTES, 30);
+
+        // 20 minutes left: blocked by the global cutoff, allowed by the resource cutoff
+        $this->assertTrue(ReservationPastTimeConstraint::IsPast($this->Slot('10:00'), $this->Slot('10:40')));
+        $this->assertFalse(ReservationPastTimeConstraint::IsPast($this->Slot('10:00'), $this->Slot('10:40'), 10));
+    }
+
+    public function testNoConstraintIgnoresResourceCutoff()
+    {
+        $this->fakeConfig->SetKey(ConfigKeys::RESERVATION_START_TIME_CONSTRAINT, ReservationStartTimeConstraint::NONE);
+
+        $this->assertFalse(ReservationPastTimeConstraint::IsPast($this->Slot('09:00'), $this->Slot('10:00'), 15));
+    }
+
     private function Slot(string $time): Date
     {
         return Date::Parse("2026-11-20 $time:00", 'UTC');

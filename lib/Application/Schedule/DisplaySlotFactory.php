@@ -5,12 +5,15 @@ require_once(ROOT_DIR . 'lib/Application/Schedule/namespace.php');
 
 class DisplaySlotFactory
 {
-    public function GetFunction(SchedulePeriod $slot, $accessAllowed = false, $functionSuffix = '')
+    /**
+     * @param int|null $startedSlotCutoffMinutes the resource's override for booking already started slots
+     */
+    public function GetFunction(SchedulePeriod $slot, $accessAllowed = false, $functionSuffix = '', ?int $startedSlotCutoffMinutes = null)
     {
         if (!$accessAllowed) {
             return "displayRestricted$functionSuffix";
         } else {
-            if ($slot->IsPastDate() && !$this->UserHasAdminRights()) {
+            if ($slot->IsPastDate($startedSlotCutoffMinutes) && !$this->UserHasAdminRights()) {
                 return "displayPastTime$functionSuffix";
             } else {
                 if ($slot->IsReservable()) {
@@ -49,7 +52,10 @@ class DisplaySlotFactory
 
 class StaticDisplaySlotFactory
 {
-    public function GetFunction(IReservationSlot $slot, $accessAllowed = false, $functionSuffix = '')
+    /**
+     * @param int|null $startedSlotCutoffMinutes the resource's override for booking already started slots
+     */
+    public function GetFunction(IReservationSlot $slot, $accessAllowed = false, $functionSuffix = '', ?int $startedSlotCutoffMinutes = null)
     {
         if ($slot->IsReserved()) {
             if ($this->IsMyReservation($slot)) {
@@ -65,7 +71,7 @@ class StaticDisplaySlotFactory
             if (!$accessAllowed) {
                 return "displayRestricted$functionSuffix";
             } else {
-                if ($slot->IsPastDate(Date::Now()) && !$this->UserHasAdminRights()) {
+                if ($slot->IsPastDate(Date::Now(), $startedSlotCutoffMinutes) && !$this->UserHasAdminRights()) {
                     return "displayPastTime$functionSuffix";
                 } else {
                     if ($slot->IsReservable()) {

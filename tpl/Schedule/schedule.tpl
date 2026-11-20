@@ -33,8 +33,8 @@
     </td>
 {/function}
 
-{function name=displaySlot}
-    {call name=$DisplaySlotFactory->GetFunction($Slot, $AccessAllowed) Slot=$Slot Href=$Href SlotRef=$SlotRef ResourceId=$ResourceId}
+{function name=displaySlot StartedSlotCutoff=null}
+    {call name=$DisplaySlotFactory->GetFunction($Slot, $AccessAllowed, '', $StartedSlotCutoff) Slot=$Slot Href=$Href SlotRef=$SlotRef ResourceId=$ResourceId}
 {/function}
 
 {* End slot display formatting *}
